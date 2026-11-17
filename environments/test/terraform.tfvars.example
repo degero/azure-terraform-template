@@ -1,0 +1,4 @@
+# terraform.tfvars - only add non-sensitive data
+location    = "eastus"
+environment = "test"
+projectname = "helloworld" # Set your project name for Azure resource naming
