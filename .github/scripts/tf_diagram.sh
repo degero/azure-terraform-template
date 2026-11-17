@@ -3,13 +3,13 @@
 # for azapi_resource (Azure Verified Modules), which TerraVision can't map itself.
 #
 # CI (plan + graph already produced by earlier workflow steps, no extra planning):
-#   tf_diagram.sh --tf-dir environments/test --plan environments/test/plan.json \
-#                 --graph environments/test/graph.dot --title "Terraform: test" \
+#   tf_diagram.sh --tf-dir environments/dev --plan environments/dev/plan.json \
+#                 --graph environments/dev/graph.dot --title "Terraform: dev" \
 #                 --out docs/test-terraform-diagram.svg
 #
 # Local (plans for you using dummy Azure credentials unless ARM_* are already set;
 # your backend must already be local, e.g. via a gitignored backend_override.tf):
-#   tf_diagram.sh --tf-dir environments/test --out docs/test.svg
+#   tf_diagram.sh --tf-dir environments/dev --out docs/dev.svg
 #
 # Requires on PATH: terravision, dot (+ neato layout engine), python3, git.
 # Also terraform when --plan/--graph are not given.

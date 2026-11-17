@@ -5,7 +5,7 @@ ARM resource types to their AzureRM icon equivalents before rendering:
 
 ```bash
 python3 scripts/terravision-azapi.py \
-  --source ./environments/test \
+  --source ./environments/dev \
   --format svg \
   --outfile docs/architecture
 ```
