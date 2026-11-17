@@ -59,7 +59,7 @@ jobs:
 
       - name: Generate documentation
         shell: bash
-        run: bash scripts/generate-docs.sh
+        run: bash .github/scripts/generate-docs.sh
 
       - name: Remove temporary Infracost input
         run: rm -f docs/infracost.md
