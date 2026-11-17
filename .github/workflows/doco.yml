@@ -27,7 +27,7 @@ jobs:
       - name: Install terraform-docs
         env:
           TERRAFORM_DOCS_VERSION: "0.18.0"
-        run: bash scripts/actions/install-terraform-docs.sh
+        run: bash .github/scripts/install-terraform-docs.sh
 
       - name: Set up Infracost
         if: hashFiles('environments/**/*.tf') != ''
