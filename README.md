@@ -69,7 +69,8 @@ tests/ (Add cross module / integration tests here)
 
 ## Setup and development
 
-Administrators see [ADMINISTRATORS.md](./ADMINISTRATORS.md). Developers see [DEVELOPERS.md](./DEVELOPERS.md)
+Administrators see [ADMINISTRATORS.md](./ADMINISTRATORS.md).
+Developers see [DEVELOPERS.md](./DEVELOPERS.md)
 
 ## Links
 
