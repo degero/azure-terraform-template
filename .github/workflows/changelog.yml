@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ssh-key: ${{ secrets.DEPLOY_KEY }} # swap in your secret's name
+          ssh-key: ${{ secrets.DOCO_DEPLOY_KEY }} # swap in your secret's name
           fetch-depth: 0 # git-cliff needs full history
 
       - name: Generate changelog
