@@ -142,7 +142,7 @@ EOF
   echo "AZURE_TENANT_ID: $tenant_id"
   echo "AZURE_SUBSCRIPTION_ID: $subscription_id"
   echo "TFPLAN_STORAGE_ACCOUNT: $storage_name"
-  echo "Run 'setup-cicd-credentials.sh' to assign these in your github account and setup deployment environments"
+  echo "Run 'setup-github-environments.sh' to assign these in your github account and setup deployment environments"
   echo ""
   echo "=== Settings to add to your /environments/$env/backend.hcl file - Ensure devs have Storage Blob Data Contributor access =="
   echo "resource_group_name = $resource_group"
