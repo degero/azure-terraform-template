@@ -149,7 +149,7 @@ jobs:
     environment: ${{ needs.config.outputs.environment }}-plan
     permissions:
       contents: write
-      # id-token: write   # uncomment if you authenticate with OIDC (ARM_USE_OIDC)
+      id-token: write # if you authenticate with OIDC (ARM_USE_OIDC)
     env:
       TF_IN_AUTOMATION: "true"
       TF_INPUT: 0
