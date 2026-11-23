@@ -112,8 +112,6 @@ for i in "${!target_envs[@]}"; do
 
   apply_identity_name="id-terraform-cicd-apply-$env"
   plan_identity_name="id-terraform-cicd-plan-$env"
-  drift_identity_name="id-terraform-cicd-drift-$env"
-  diag_identity_name="id-terraform-cicd-diag-$env"
 
   if ! az identity show -n "$apply_identity_name" -g "$resource_group" &>/dev/null; then
     echo "Skipping $env: identity $apply_identity_name not found in $resource_group (has this env been set up yet?)" >&2
@@ -123,19 +121,9 @@ for i in "${!target_envs[@]}"; do
     echo "Skipping $env: identity $plan_identity_name not found in $resource_group (has this env been set up yet?)" >&2
     continue
   fi
-  if ! az identity show -n "$drift_identity_name" -g "$resource_group" &>/dev/null; then
-    echo "Skipping $env: identity $drift_identity_name not found in $resource_group (has this env been set up yet?)" >&2
-    continue
-  fi
-  if ! az identity show -n "$diag_identity_name" -g "$resource_group" &>/dev/null; then
-    echo "Skipping $env: identity $diag_identity_name not found in $resource_group (has this env been set up yet?)" >&2
-    continue
-  fi
 
   apply_client_id=$(az identity show -n "$apply_identity_name" -g "$resource_group" --query clientId -o tsv)
   plan_client_id=$(az identity show -n "$plan_identity_name" -g "$resource_group" --query clientId -o tsv)
-  drift_client_id=$(az identity show -n "$drift_identity_name" -g "$resource_group" --query clientId -o tsv)
-  diag_client_id=$(az identity show -n "$diag_identity_name" -g "$resource_group" --query clientId -o tsv)
 
   for repo in "${repos[@]}"; do
     repo_slug=$(slugify_repo "$repo")
