@@ -232,7 +232,7 @@ def remove_link_fragment(match):
     target = target.strip()
     if target.startswith('#'):
         anchor = target.lower()
-        if anchor in {'#modules', '#module-groups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
+        if anchor in {'#repo-modules-modules', '#module-groups-modulegroups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
             return match.group(0)
         return label
 
@@ -244,7 +244,7 @@ def remove_html_fragment(match):
     quote, href, attributes, label = match.groups()
     if href.startswith('#'):
         anchor = href.lower()
-        if anchor in {'#modules', '#module-groups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
+        if anchor in {'#repo-modules-modules', '#module-groups-modulegroups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
             return match.group(0)
         return label
 
