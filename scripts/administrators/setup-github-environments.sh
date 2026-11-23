@@ -135,12 +135,17 @@ for i in "${!target_envs[@]}"; do
     echo "=== Provisioning GitHub Environments: $env / ${env}-plan for $repo ==="
 
     # name:GH-environment  identity_name  client_id  workflow-file
-    for stage in "apply" "plan"; do
+    for stage in "apply" "plan" "drift"; do
       if [[ "$stage" == "apply" ]]; then
         name="${env}-apply"
         identity_name="$apply_identity_name"
         client_id="$apply_client_id"
         workflow_file="tf-apply.yml"
+      elif [[ "$stage" == "drift" ]]; then
+        name="${env}-plan"
+        identity_name="$plan_identity_name"
+        client_id="$plan_client_id"
+        workflow_file="tf-drift.yml"
       else
         name="${env}-plan"
         identity_name="$plan_identity_name"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 docs_root="$repo_root/docs"
 export PATH="${HOME}/.local/bin:${PATH}"
 
@@ -130,7 +130,19 @@ docs_root = Path(sys.argv[1])
 repo_root = Path(sys.argv[2])
 env_files = [Path(p) for p in sys.argv[3:] if p]
 
-lines = ['# Terraform Documentation', '']
+toc_lines = ['## Table of Contents', '']
+for env_file in env_files:
+    content = env_file.read_text(encoding='utf-8', errors='replace').rstrip()
+    if not content:
+        continue
+    heading = content.splitlines()[0]
+    prefix = '## Environment: '
+    if heading.startswith(prefix):
+        env_name = heading[len(prefix):]
+        toc_lines.append(f'- [Environment: {env_name}](#environment-{env_name.lower()})')
+toc_lines += ['- [Diagram](#diagram)', '- [Cost Breakdown](#cost-breakdown)', '']
+
+lines = ['# Terraform Documentation', '', *toc_lines]
 
 if env_files:
     for env_file in env_files:

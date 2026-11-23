@@ -35,6 +35,9 @@ jobs:
         env:
           OUTPUT: CHANGELOG.md
 
+      - name: Format changelog
+        run: npx prettier --write CHANGELOG.md
+
       - name: Commit and push if changed
         run: |
           if git diff --quiet -- CHANGELOG.md; then
