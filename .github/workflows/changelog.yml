@@ -19,8 +19,8 @@ permissions:
 jobs:
   changelog:
     runs-on: ubuntu-latest
-    # Extra loop guard: skip commits made by this workflow
-    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    # Extra loop guard: skip commits made by this workflow - Skipped in the template repo itself; runs in repos generated from it.
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') && !github.event.repository.is_template }}
     steps:
       - uses: actions/checkout@v4
         with:
