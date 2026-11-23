@@ -147,48 +147,46 @@ for i in "${!target_envs[@]}"; do
     echo "=== Provisioning GitHub Environments: $env / ${env}-plan for $repo ==="
 
     # name:GH-environment  identity_name  client_id  workflow-file
-    for stage in "apply" "plan" "drift" "diag"; do
+    for stage in "apply" "plan"; do
       if [[ "$stage" == "apply" ]]; then
         name="${env}-apply"
         identity_name="$apply_identity_name"
         client_id="$apply_client_id"
-        workflow_file="tf-apply.yml"
-      elif [[ "$stage" == "drift" ]]; then
-        name="${env}-drift"
-        identity_name="$drift_identity_name"
-        client_id="$drift_client_id"
-        workflow_file="tf-drift.yml"
-      elif [[ "$stage" == "diag" ]]; then
-        name="${env}-diag"
-        identity_name="$diag_identity_name"
-        client_id="$diag_client_id"
-        workflow_file="diagram.yml"
+        workflow_files=("tf-apply.yml")
       else
         name="${env}-plan"
         identity_name="$plan_identity_name"
         client_id="$plan_client_id"
-        workflow_file="tf-plan.yml"
+        workflow_files=("tf-plan.yml" "tf-drift.yml" "diagram.yml")
       fi
 
-      job_workflow_ref="${repo}/.github/workflows/${workflow_file}@refs/heads/main"
+      for workflow_file in "${workflow_files[@]}"; do
+        job_workflow_ref="${repo}/.github/workflows/${workflow_file}@refs/heads/main"
 
-      # this is an added layer of OIDC security, at the cost of Dependabot / Github Advanced security working
-      if [ "$ADD_ENVIRONMENT_SUBJECT_CLAIM" = "true" ]; then
-        subject="repository_owner_id:${owner_id}:repository_id:${repo_id}:environment:${name}:job_workflow_ref:${job_workflow_ref}"
-      else
-        subject="repository_owner_id:${owner_id}:repository_id:${repo_id}:job_workflow_ref:${job_workflow_ref}"
-      fi
+        # this is an added layer of OIDC security, at the cost of Dependabot / Github Advanced security working
+        if [ "$ADD_ENVIRONMENT_SUBJECT_CLAIM" = "true" ]; then
+          subject="repository_owner_id:${owner_id}:repository_id:${repo_id}:environment:${name}:job_workflow_ref:${job_workflow_ref}"
+        else
+          subject="repository_owner_id:${owner_id}:repository_id:${repo_id}:job_workflow_ref:${job_workflow_ref}"
+        fi
 
-      echo "  -> federated credential for '$name' (identity: $identity_name, workflow: $workflow_file)"
-      az identity federated-credential create \
-        --name "fic-github-$repo_slug-$stage-$env" \
-        --identity-name "$identity_name" \
-        --resource-group "$resource_group" \
-        --issuer "https://token.actions.githubusercontent.com" \
-        --subject "$subject" \
-        --audiences "api://AzureADTokenExchange" \
-        &>/dev/null
+        # Keep the original name for the primary workflow so existing credentials
+        # aren't duplicated; extra workflows get a suffix (dots aren't allowed in names)
+        fic_name="fic-github-$repo_slug-$stage-$env"
+        if [[ "$workflow_file" != "tf-${stage}.yml" ]]; then
+          fic_name="${fic_name}-${workflow_file%.yml}"
+        fi
 
+        echo "  -> federated credential '$fic_name' for '$name' (identity: $identity_name, workflow: $workflow_file)"
+        az identity federated-credential create \
+          --name "$fic_name" \
+          --identity-name "$identity_name" \
+          --resource-group "$resource_group" \
+          --issuer "https://token.actions.githubusercontent.com" \
+          --subject "$subject" \
+          --audiences "api://AzureADTokenExchange" \
+          >/dev/null
+      done
       echo "  -> ensuring GitHub Environment '$name' exists on $repo"
       gh api --method PUT "repos/$repo/environments/$name" >/dev/null
 
