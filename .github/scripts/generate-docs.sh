@@ -149,9 +149,9 @@ for env_file in env_files:
         env_name = heading[len(prefix):]
         toc_lines.append(f'- [Environment: {env_name}](#environment-{env_name.lower()})')
 if module_readmes:
-    toc_lines.append('- [Modules](#modules)')
+    toc_lines.append('- [Modules](#repo-modules-modules)')
 if modulegroup_readmes:
-    toc_lines.append('- [Module Groups](#module-groups)')
+    toc_lines.append('- [Module Groups](#module-groups-modulegroups)')
 toc_lines += ['- [Diagram](#diagram)', '- [Cost Breakdown](#cost-breakdown)', '']
 
 lines = ['# Terraform Documentation', '', *toc_lines]
@@ -164,14 +164,14 @@ if env_files:
             lines.append('')
 
 if module_readmes:
-    lines += ['## Modules', '', 'Modules used by environments. These are located in `modules/`.', '']
+    lines += ['## Repo Modules (/modules)', '', 'Modules used by environments. These are located in `modules/`.', '']
     for readme in module_readmes:
         display = readme.parent.relative_to(module_root).as_posix()
         lines.append(f'- [{display}](./modules/{display}/README.md)')
     lines.append('')
 
 if modulegroup_readmes:
-    lines += ['## Module Groups', '', 'Module groups used by environments. These are located in `modulegroups/`.', '']
+    lines += ['## Module Groups (/modulegroups)', '', 'Module groups used by environments. These are located in `modulegroups/`.', '']
     for readme in modulegroup_readmes:
         display = readme.relative_to(repo_root).as_posix()
         lines.append(f'- [{display}]({readme.relative_to(repo_root).as_posix()})')
