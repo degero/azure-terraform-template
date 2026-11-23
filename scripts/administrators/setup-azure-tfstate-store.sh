@@ -101,9 +101,11 @@ EOF
 
   identity_name_apply="id-terraform-cicd-apply-$env"
   identity_name_plan="id-terraform-cicd-plan-$env"
-  echo "Creating Identity: $identity_name_apply and $identity_name_plan"
+  identity_name_drift="id-terraform-cicd-drift-$env"
+  identity_name_diag="id-terraform-cicd-diag-$env"
+  echo "Creating Identity: $identity_name_apply, $identity_name_plan, $identity_name_drift and $identity_name_diag "
 
-  for identity_name in "$identity_name_apply" "$identity_name_plan"; do
+  for identity_name in "$identity_name_apply" "$identity_name_plan" "$identity_name_drift" "$identity_name_diag"; do
     az identity create -o none \
       --name "$identity_name" \
       --resource-group "$resource_group"

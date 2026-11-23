@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 docs_root="$repo_root/docs"
 export PATH="${HOME}/.local/bin:${PATH}"
 
@@ -130,7 +130,31 @@ docs_root = Path(sys.argv[1])
 repo_root = Path(sys.argv[2])
 env_files = [Path(p) for p in sys.argv[3:] if p]
 
-lines = ['# Terraform Documentation', '']
+module_root = docs_root / 'modules'
+module_readmes = sorted(
+    [p for p in module_root.rglob('README.md') if p.is_file() and p.parent != module_root],
+    key=lambda p: p.relative_to(docs_root).as_posix(),
+)
+modulegroup_root = repo_root / 'modulegroups'
+modulegroup_readmes = sorted([p for p in modulegroup_root.rglob('README.md') if p.is_file()]) if modulegroup_root.exists() else []
+
+toc_lines = ['## Table of Contents', '']
+for env_file in env_files:
+    content = env_file.read_text(encoding='utf-8', errors='replace').rstrip()
+    if not content:
+        continue
+    heading = content.splitlines()[0]
+    prefix = '## Environment: '
+    if heading.startswith(prefix):
+        env_name = heading[len(prefix):]
+        toc_lines.append(f'- [Environment: {env_name}](#environment-{env_name.lower()})')
+if module_readmes:
+    toc_lines.append('- [Modules](#repo-modules-modules)')
+if modulegroup_readmes:
+    toc_lines.append('- [Module Groups](#module-groups-modulegroups)')
+toc_lines += ['- [Diagram](#diagram)', '- [Cost Breakdown](#cost-breakdown)', '']
+
+lines = ['# Terraform Documentation', '', *toc_lines]
 
 if env_files:
     for env_file in env_files:
@@ -139,22 +163,15 @@ if env_files:
             lines.append(content)
             lines.append('')
 
-module_root = docs_root / 'modules'
-module_readmes = sorted(
-    [p for p in module_root.rglob('README.md') if p.is_file() and p.parent != module_root],
-    key=lambda p: p.relative_to(docs_root).as_posix(),
-)
 if module_readmes:
-    lines += ['## Modules', '', 'Modules used by environments. These are located in `modules/`.', '']
+    lines += ['## Repo Modules (/modules)', '', 'Modules used by environments. These are located in `modules/`.', '']
     for readme in module_readmes:
         display = readme.parent.relative_to(module_root).as_posix()
         lines.append(f'- [{display}](./modules/{display}/README.md)')
     lines.append('')
 
-modulegroup_root = repo_root / 'modulegroups'
-modulegroup_readmes = sorted([p for p in modulegroup_root.rglob('README.md') if p.is_file()]) if modulegroup_root.exists() else []
 if modulegroup_readmes:
-    lines += ['## Module Groups', '', 'Module groups used by environments. These are located in `modulegroups/`.', '']
+    lines += ['## Module Groups (/modulegroups)', '', 'Module groups used by environments. These are located in `modulegroups/`.', '']
     for readme in modulegroup_readmes:
         display = readme.relative_to(repo_root).as_posix()
         lines.append(f'- [{display}]({readme.relative_to(repo_root).as_posix()})')
@@ -214,6 +231,9 @@ def remove_link_fragment(match):
     label, target = match.groups()
     target = target.strip()
     if target.startswith('#'):
+        anchor = target.lower()
+        if anchor in {'#modules', '#module-groups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
+            return match.group(0)
         return label
 
     destination, separator, title = target.partition(' ')
@@ -223,6 +243,9 @@ def remove_link_fragment(match):
 def remove_html_fragment(match):
     quote, href, attributes, label = match.groups()
     if href.startswith('#'):
+        anchor = href.lower()
+        if anchor in {'#modules', '#module-groups', '#diagram', '#cost-breakdown'} or anchor.startswith('#environment-'):
+            return match.group(0)
         return label
 
     href = href.split('#', 1)[0]

@@ -112,6 +112,8 @@ for i in "${!target_envs[@]}"; do
 
   apply_identity_name="id-terraform-cicd-apply-$env"
   plan_identity_name="id-terraform-cicd-plan-$env"
+  drift_identity_name="id-terraform-cicd-drift-$env"
+  diag_identity_name="id-terraform-cicd-diag-$env"
 
   if ! az identity show -n "$apply_identity_name" -g "$resource_group" &>/dev/null; then
     echo "Skipping $env: identity $apply_identity_name not found in $resource_group (has this env been set up yet?)" >&2
@@ -121,9 +123,19 @@ for i in "${!target_envs[@]}"; do
     echo "Skipping $env: identity $plan_identity_name not found in $resource_group (has this env been set up yet?)" >&2
     continue
   fi
+  if ! az identity show -n "$drift_identity_name" -g "$resource_group" &>/dev/null; then
+    echo "Skipping $env: identity $drift_identity_name not found in $resource_group (has this env been set up yet?)" >&2
+    continue
+  fi
+  if ! az identity show -n "$diag_identity_name" -g "$resource_group" &>/dev/null; then
+    echo "Skipping $env: identity $diag_identity_name not found in $resource_group (has this env been set up yet?)" >&2
+    continue
+  fi
 
   apply_client_id=$(az identity show -n "$apply_identity_name" -g "$resource_group" --query clientId -o tsv)
   plan_client_id=$(az identity show -n "$plan_identity_name" -g "$resource_group" --query clientId -o tsv)
+  drift_client_id=$(az identity show -n "$drift_identity_name" -g "$resource_group" --query clientId -o tsv)
+  diag_client_id=$(az identity show -n "$diag_identity_name" -g "$resource_group" --query clientId -o tsv)
 
   for repo in "${repos[@]}"; do
     repo_slug=$(slugify_repo "$repo")
@@ -135,12 +147,22 @@ for i in "${!target_envs[@]}"; do
     echo "=== Provisioning GitHub Environments: $env / ${env}-plan for $repo ==="
 
     # name:GH-environment  identity_name  client_id  workflow-file
-    for stage in "apply" "plan"; do
+    for stage in "apply" "plan" "drift" "diag"; do
       if [[ "$stage" == "apply" ]]; then
         name="${env}-apply"
         identity_name="$apply_identity_name"
         client_id="$apply_client_id"
         workflow_file="tf-apply.yml"
+      elif [[ "$stage" == "drift" ]]; then
+        name="${env}-drift"
+        identity_name="$drift_identity_name"
+        client_id="$drift_client_id"
+        workflow_file="tf-drift.yml"
+      elif [[ "$stage" == "diag" ]]; then
+        name="${env}-diag"
+        identity_name="$diag_identity_name"
+        client_id="$diag_client_id"
+        workflow_file="diagram.yml"
       else
         name="${env}-plan"
         identity_name="$plan_identity_name"

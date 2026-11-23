@@ -110,9 +110,9 @@ jobs:
           fi
 
           if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" == "refs/heads/main" ]]; then
-            diagram_filename="${environment##*/}-terraform-diagram.svg"
-          else
             diagram_filename="terraform-diagram.svg"
+          else
+            diagram_filename="${environment##*/}-terraform-diagram.svg"
           fi
 
           if [[ -z "$environment_name" || "$environment_name" == "." ]]; then
@@ -235,6 +235,9 @@ jobs:
             echo "::error::$DOCS_PATH/$DIAGRAM_FILENAME is missing or empty."
             exit 1
           fi
+          if [[ "$GITHUB_EVENT_NAME" == "push" && "$GITHUB_REF" == "refs/heads/main" ]]; then
+            find "$DOCS_PATH" -maxdepth 1 -type f -name '*-terraform-diagram.svg' ! -name "$DIAGRAM_FILENAME" -delete
+          fi
           ls -l "$DOCS_PATH/$DIAGRAM_FILENAME"
 
       - name: Ensure README references the diagram
@@ -293,7 +296,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "$SVG" "$DOCS_PATH/README.md"
+          git add -A "$DOCS_PATH"
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
