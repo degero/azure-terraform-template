@@ -22,7 +22,7 @@ jobs:
     # Extra loop guard: skip commits made by this workflow - Skipped in the template repo itself; runs in repos generated from it.
     if: ${{ !contains(github.event.head_commit.message, '[skip ci]') && !github.event.repository.is_template }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ssh-key: ${{ secrets.DOCO_DEPLOY_KEY }} # swap in your secret's name
           fetch-depth: 0 # git-cliff needs full history
