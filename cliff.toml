@@ -80,8 +80,9 @@ protect_breaking_commits = false
 # Assigns commits to groups.
 # Optionally sets the commit's scope and can decide to exclude commits from further processing.
 commit_parsers = [
-    { message = "^docs: update terraform docs$", skip = true },
-    { message = "^chore: update Terraform diagram$", skip = true },
+    { message = "\\[skip ci\\]", skip = true },
+    { message = "(?i)^(docs: |chore: )?update terraform docs", skip = true },
+    { message = "(?i)^(docs: |chore: )?update terraform diagram", skip = true },
     { message = "^docs: update CHANGELOG.md", skip = true },
     { message = "^feat", group = "<!-- 0 -->🚀 Features" },
     { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
