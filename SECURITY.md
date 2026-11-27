@@ -1,5 +1,10 @@
 # Security Policy
 
+## Scope
+
+This policy covers the [azure-terraform-template](https://github.com/degero/azure-terraform-template) source code only. Vulnerabilities
+in third-party dependencies should be reported to their respective maintainers.
+
 ## Reporting a Vulnerability
 
 **Please do not report security vulnerabilities through public GitHub issues,
@@ -26,8 +31,3 @@ at [@degero](https://github.com/degero) for contact details.
 - **Fix & disclosure:** once a fix is released, we'll publish a GitHub
   Security Advisory crediting you (unless you prefer to stay anonymous), and
   reference the advisory in the [README.md](./README.md).
-
-## Scope
-
-This policy covers the azure-terraform-template source code only. Vulnerabilities
-in third-party dependencies should be reported to their respective maintainers.
