@@ -78,7 +78,7 @@ This is required for OIDC login. The federated credentials are pinned to `job_wo
 
 ### Adding a new environment later
 
-If you wish to add other environments later, replace .env file `ENVS` with new ones, set `TFPLAN_STORAGE_ACCOUNTS`="" and run the above steps 2, 3, and 4. Copy the lower env folder eg `environments/dev` to the new name (be sure to remove .terraform folder and terraform.lock.hcl in the target folder) then follow step 5 (but disregard the use of the example file). The changes in step 5 will just be minor adjustments for the new environment name / tf state storage account / tfstate name.
+If you wish to add other environments later, replace .env file `ENVS` with new ones, set `TFPLAN_STORAGE_ACCOUNTS`="" (and take not of these) and run the above steps 2, and 3. Then update `ENVS` to the previous envs (without the new one) and run `./setup-github-environments.sh <env>`. Copy the lower env folder eg `environments/dev` to the new name (be sure to remove .terraform folder and terraform.lock.hcl in the target folder) then follow step 5 (but disregard the use of the example file). The changes in step 5 will just be minor adjustments for the new environment name / tf state storage account / tfstate name.
 
 ### Cleanup
 
