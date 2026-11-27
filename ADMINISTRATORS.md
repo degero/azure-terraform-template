@@ -64,9 +64,9 @@ This is required for OIDC login. The federated credentials are pinned to `job_wo
 
 7. **Set GitHub Environment approval rules.** In GitHub, add required reviewers to each `<env>-apply` environment where an approval is needed. `<env>-plan` normally has no reviewers so plans run automatically.
 8. **Optional: docs workflow.** Add repository secrets `DOCO_DEPLOY_KEY` (used to push generated docs, it needs to have write access, to create see [managing deploy keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys)) and `INFRACOST_API_KEY`. The docs workflow does not target a GitHub Environment, so these are repository secrets, not environment secrets.
-9. **Pull request behaviour (optional).** Pull requests run Terraform plan for every environment but do **not** apply by default. To also apply the lowest (first) environment in `TF_ENVIRONMENTS` on PRs, set the repository variable `PR_TF_APPLY` to `true`. Apply is skipped for PRs from forks, and still runs in the `<env>-apply` GitHub Environment, so any required reviewers there still gate it.
+9. **Pull request behaviour (optional).** Pull requests run Terraform plan for every environment but do **not** apply by default. To also apply the lowest (first) environment in `TF_ENVIRONMENTS` on PRs, set the repository variable `PR_TF_APPLY` to `true`. Note that doing this can result in a lost PR plan summary in the case where a push fails and then is resolved as there is no 'full-apply' for it to summarise. Apply is skipped for PRs from forks, and still runs in the `<env>-apply` GitHub Environment, so any required reviewers there still gate it.
 10. **CHANGELOG.md** In **Github → Settings → General → Pull Requests**, set **Default commit message** to **Pull request title**. Also Delete the current `CHANGELOG.md` from the repo and update `cliff.toml` `commit_preprocessors`, `postprocessors` sections for links to PRs to appear in the `CHANGELOG.md`. Git cliff in changelog.yml workflow runs on `main` and composes `CHANGELOG.md` from PR titles so long as developers follow [Conventional Commits](https://www.conventionalcommits.org/) guidelines, guidance for devs is in [DEVELOPERS.md](DEVELOPERS.md#conventional-commits).
-11. **Code and Dependency Scanning** In **Github → Settings → Advanced Security** turn on **Dependabot → Alerts, Malware Updates, Security updates** and **Code Security → CodeQL Analysis** to make use of the repos dependabot.yml and codeql.yml workflows. The latter is only available in public repos and paid github accounts. CodeQL SARIF upload is disabled by default. To enable, set a repo env var `ENABLE_SARIF_UPLOAD` = `true`.
+11. **Code and Dependency Scanning** In **Github → Settings → Advanced Security** turn on **Dependabot → Alerts, Malware Updates, Security updates** to make use of the repos dependabot.yml. Run the codeql.yml workflow in github UI and verify it is picked up in and **Code Security → CodeQL Analysis** settings section as 'advanced setup'. The latter is only available in public repos and paid github accounts. CodeQL SARIF upload is disabled by default. To enable, set a repo env var `ENABLE_SARIF_UPLOAD` = `true`.
 12. **Developer access to tfstate and target deployment RGs** If you wish to allow developers to access and run terraform plan in their local environment they will need Contributor access on either a subscription or each target deployment resource group and for each tf state storage "Storage Blob Data Contributor":
 
     ```
@@ -76,9 +76,9 @@ This is required for OIDC login. The federated credentials are pinned to `job_wo
     --scope "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.Storage/storageAccounts/<storage-account-name>/blobServices/default/containers/tfstate"
     ```
 
-### Adding an environment later
+### Adding a new environment later
 
-Run `./setup-github-environments.sh <new-env>` (this also appends it to `ENVS` in `.env`), but only after `setup-azure-tfstate-store.sh` has provisioned it. Then add `environments/<new-env>/` with its `backend.hcl` (force-added, as in step 5), and set approval rules on `<new-env>-apply`.
+If you wish to add other environments later, replace .env file `ENVS` with new ones, set `TFPLAN_STORAGE_ACCOUNTS`="" and run the above steps 2, 3, and 4. Copy the lower env folder eg `environments/dev` to the new name (be sure to remove .terraform folder and terraform.lock.hcl in the target folder) then follow step 5 (but disregard the use of the example file). The changes in step 5 will just be minor adjustments for the new environment name / tf state storage account / tfstate name.
 
 ### Cleanup
 
